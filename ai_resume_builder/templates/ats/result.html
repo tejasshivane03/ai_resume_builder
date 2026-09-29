@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ATS Result – {{ result.score }}%{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ats.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <a href="{% url 'ats_checker' %}" class="btn btn-ghost btn-sm">← New Check</a>
+        </div>
+    </div>
+
+    <!-- Score hero -->
+    <div class="ats-result-hero" id="ats-result-hero">
+        <div class="score-ring {% if result.score >= 70 %}score-high{% elif result.score >= 40 %}score-mid{% else %}score-low{% endif %}"
+             id="score-ring">
+            <svg viewBox="0 0 120 120" class="score-svg">
+                <circle cx="60" cy="60" r="54" class="score-bg" />
+                <circle cx="60" cy="60" r="54" class="score-fill"
+                        style="--score: {{ result.score }}" />
+            </svg>
+            <span class="score-value">{{ result.score }}%</span>
+        </div>
+        <div class="score-info">
+            <h1>ATS Compatibility Score</h1>
+            {% if result.job_title %}<p class="score-job">{{ result.job_title }}</p>{% endif %}
+            <p class="score-date">Checked {{ result.created_at|timesince }} ago</p>
+        </div>
+    </div>
+
+    <!-- Section scores -->
+    {% if section_scores %}
+    <div class="result-card" id="section-scores-card">
+        <h2>Section Analysis</h2>
+        <div class="section-bars">
+            {% for section, score in section_scores.items %}
+            <div class="section-bar-row">
+                <span class="section-label">{{ section }}</span>
+                <div class="section-bar">
+                    <div class="section-bar-fill {% if score >= 70 %}bar-high{% elif score >= 40 %}bar-mid{% else %}bar-low{% endif %}"
+                         style="width: {{ score }}%"></div>
+                </div>
+                <span class="section-percent">{{ score }}%</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Matched keywords -->
+    {% if matched %}
+    <div class="result-card" id="matched-keywords-card">
+        <h2>✅ Matched Keywords ({{ matched|length }})</h2>
+        <div class="keyword-tags">
+            {% for kw in matched %}
+            <span class="keyword-tag tag-matched">{{ kw }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Missing keywords -->
+    {% if missing %}
+    <div class="result-card" id="missing-keywords-card">
+        <h2>❌ Missing Keywords ({{ missing|length }})</h2>
+        <div class="keyword-tags">
+            {% for kw in missing %}
+            <span class="keyword-tag tag-missing">{{ kw }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Suggestions -->
+    {% if suggestions %}
+    <div class="result-card" id="suggestions-card">
+        <h2>💡 Suggestions</h2>
+        <ul class="suggestions-list">
+            {% for s in suggestions %}
+            <li>{{ s }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="result-footer">
+        <a href="{% url 'ats_checker' %}" class="btn btn-primary" id="run-another-check">Run Another Check</a>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline" id="back-to-dashboard">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

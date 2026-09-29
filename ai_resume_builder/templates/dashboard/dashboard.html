@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard – AI Resume Builder{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+    <div class="dashboard-header">
+        <div>
+            <h1 class="page-title">Welcome back, {{ user.first_name|default:user.username }}!</h1>
+            <p class="page-subtitle">Manage your professional resumes and ATS optimization reports.</p>
+        </div>
+        <div class="dashboard-actions">
+            <a href="{% url 'resume_create' %}" class="btn btn-primary">+ Create New Resume</a>
+            <a href="{% url 'ats_checker' %}" class="btn btn-outline">🎯 Check ATS Score</a>
+        </div>
+    </div>
+
+    <!-- Overview Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon icon-blue">📄</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ total_resumes }}</div>
+                <div class="stat-label">Total Resumes</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon icon-purple">🎯</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ total_ats_checks }}</div>
+                <div class="stat-label">ATS Scans Run</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon icon-green">⚡</div>
+            <div class="stat-info">
+                <div class="stat-value">AI Active</div>
+                <div class="stat-label">Smart Assistant</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Recent Resumes -->
+        <div class="dashboard-card">
+            <div class="card-header-row">
+                <h2>My Resumes</h2>
+                <a href="{% url 'resume_list' %}" class="link-sm">View All →</a>
+            </div>
+            
+            {% if resumes %}
+                <div class="resume-list">
+                    {% for r in resumes %}
+                        <div class="resume-item">
+                            <div class="resume-item-info">
+                                <h3>{{ r.title }}</h3>
+                                <p class="meta">Updated {{ r.updated_at|timesince }} ago • <span class="badge badge-subtle">{{ r.template|title }}</span></p>
+                            </div>
+                            <div class="resume-item-actions">
+                                <a href="{% url 'resume_builder' pk=r.pk %}" class="btn btn-sm btn-outline">Edit</a>
+                                <a href="{% url 'resume_preview' pk=r.pk %}" class="btn btn-sm btn-ghost">Preview</a>
+                                <a href="{% url 'resume_download_pdf' pk=r.pk %}" class="btn btn-sm btn-ghost">PDF</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <p>No resumes created yet.</p>
+                    <a href="{% url 'resume_create' %}" class="btn btn-primary btn-sm">Create Your First Resume</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent ATS Scans -->
+        <div class="dashboard-card">
+            <div class="card-header-row">
+                <h2>Recent ATS Checks</h2>
+                <a href="{% url 'ats_history' %}" class="link-sm">View History →</a>
+            </div>
+
+            {% if ats_results %}
+                <div class="ats-list">
+                    {% for res in ats_results %}
+                        <div class="ats-item">
+                            <div class="ats-item-info">
+                                <h3>{{ res.job_title|default:'Target Role' }}</h3>
+                                <p class="meta">{{ res.resume_title }} • {{ res.created_at|date:"M d, Y" }}</p>
+                            </div>
+                            <div class="ats-item-score">
+                                <span class="score-badge {% if res.score >= 75 %}score-high{% elif res.score >= 50 %}score-mid{% else %}score-low{% endif %}">
+                                    {{ res.score }}%
+                                </span>
+                                <a href="{% url 'ats_result_detail' pk=res.pk %}" class="btn btn-sm btn-ghost">Report</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📊</div>
+                    <p>No ATS scans performed yet.</p>
+                    <a href="{% url 'ats_checker' %}" class="btn btn-outline btn-sm">Run ATS Scan</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

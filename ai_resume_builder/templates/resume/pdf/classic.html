@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ resume.title }}</title>
+    <style>
+        @page { size: letter portrait; margin: 15mm; }
+        body { font-family: 'Times New Roman', Georgia, serif; font-size: 10.5pt; line-height: 1.4; color: #111; }
+        .name { text-align: center; font-size: 22pt; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
+        .contact { text-align: center; font-size: 9pt; margin-bottom: 15px; border-bottom: 1px solid #111; padding-bottom: 8px; }
+        .section-title { font-size: 12pt; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #333; margin-top: 14px; margin-bottom: 6px; }
+        .item-header { font-weight: bold; }
+        .date { float: right; font-weight: normal; font-style: italic; }
+        .desc { margin-top: 3px; font-size: 10pt; }
+        .skills-list { font-size: 10pt; margin-top: 4px; }
+    </style>
+</head>
+<body>
+    <div class="name">{{ resume.full_name|default:"Resume" }}</div>
+    <div class="contact">
+        {% if resume.email %}{{ resume.email }}{% endif %}
+        {% if resume.phone %} • {{ resume.phone }}{% endif %}
+        {% if resume.location %} • {{ resume.location }}{% endif %}
+        {% if resume.linkedin %} • {{ resume.linkedin }}{% endif %}
+        {% if resume.website %} • {{ resume.website }}{% endif %}
+    </div>
+
+    {% if resume.summary %}
+    <div class="section-title">Summary</div>
+    <div>{{ resume.summary }}</div>
+    {% endif %}
+
+    {% if experience %}
+    <div class="section-title">Experience</div>
+    {% for exp in experience %}
+    <div style="margin-bottom: 8px;">
+        <span class="date">{{ exp.startDate }} {% if exp.endDate %}– {{ exp.endDate }}{% elif exp.current %}– Present{% endif %}</span>
+        <div class="item-header">{{ exp.title }}{% if exp.company %}, <em>{{ exp.company }}</em>{% endif %}</div>
+        {% if exp.description %}<div class="desc">{{ exp.description|linebreaksbr }}</div>{% endif %}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if education %}
+    <div class="section-title">Education</div>
+    {% for edu in education %}
+    <div style="margin-bottom: 6px;">
+        <span class="date">{{ edu.startDate }} {% if edu.endDate %}– {{ edu.endDate }}{% endif %}</span>
+        <div class="item-header">{{ edu.degree }}{% if edu.school %}, <em>{{ edu.school }}</em>{% endif %}</div>
+        {% if edu.description %}<div class="desc">{{ edu.description }}</div>{% endif %}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if skills %}
+    <div class="section-title">Skills</div>
+    <div class="skills-list">
+        <strong>Skills:</strong> {{ skills|join:", " }}
+    </div>
+    {% endif %}
+</body>
+</html>

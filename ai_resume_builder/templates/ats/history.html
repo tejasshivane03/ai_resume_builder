@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ATS Scans History – AI Resume Builder{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header-row">
+        <div>
+            <h1 class="page-title">ATS History</h1>
+            <p class="page-subtitle">Past ATS scans and optimization reports.</p>
+        </div>
+        <a href="{% url 'ats_checker' %}" class="btn btn-primary">🎯 New ATS Check</a>
+    </div>
+
+    {% if results %}
+        <div class="ats-history-grid">
+            {% for res in results %}
+                <div class="ats-card">
+                    <div class="ats-card-header">
+                        <div>
+                            <h2 class="ats-card-title">{{ res.job_title|default:"Target Role" }}</h2>
+                            <p class="ats-card-subtitle">{{ res.resume_title }}</p>
+                        </div>
+                        <span class="score-badge {% if res.score >= 70 %}score-high{% elif res.score >= 40 %}score-mid{% else %}score-low{% endif %}">
+                            {{ res.score }}% Match
+                        </span>
+                    </div>
+                    <div class="ats-card-body">
+                        <p class="meta-date">Scanned on {{ res.created_at|date:"M d, Y @ H:i" }}</p>
+                    </div>
+                    <div class="ats-card-footer">
+                        <a href="{% url 'ats_result_detail' pk=res.pk %}" class="btn btn-outline btn-sm btn-block">View Full Report</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state card-empty">
+            <div class="empty-icon">📊</div>
+            <h2>No ATS History Found</h2>
+            <p>You haven't run any ATS compatibility scans yet.</p>
+            <a href="{% url 'ats_checker' %}" class="btn btn-primary mt-3">Run Your First Check</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

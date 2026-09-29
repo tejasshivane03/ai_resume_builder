@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Resumes – AI Resume Builder{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header-row">
+        <div>
+            <h1 class="page-title">My Resumes</h1>
+            <p class="page-subtitle">Create, edit, preview, and download your resumes.</p>
+        </div>
+        <a href="{% url 'resume_create' %}" class="btn btn-primary">+ Create New Resume</a>
+    </div>
+
+    {% if resumes %}
+        <div class="resumes-grid">
+            {% for r in resumes %}
+                <div class="resume-card">
+                    <div class="resume-card-body">
+                        <span class="badge badge-accent mb-2">{{ r.template|title }} Template</span>
+                        <h2 class="resume-card-title">{{ r.title }}</h2>
+                        <p class="resume-card-meta">
+                            {% if r.full_name %}<strong>{{ r.full_name }}</strong> • {% endif %}
+                            Updated {{ r.updated_at|date:"M d, Y" }}
+                        </p>
+                        <p class="resume-card-summary">
+                            {{ r.summary|truncatewords:20|default:"No summary added yet." }}
+                        </p>
+                    </div>
+                    <div class="resume-card-footer">
+                        <a href="{% url 'resume_builder' pk=r.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                        <a href="{% url 'resume_preview' pk=r.pk %}" class="btn btn-outline btn-sm">Preview</a>
+                        <a href="{% url 'resume_download_pdf' pk=r.pk %}" class="btn btn-ghost btn-sm">PDF</a>
+                        <form method="post" action="{% url 'resume_delete' pk=r.pk %}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this resume?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger-ghost btn-sm">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state card-empty">
+            <div class="empty-icon">📄</div>
+            <h2>No Resumes Found</h2>
+            <p>Get started by creating your first ATS-optimized resume in minutes!</p>
+            <a href="{% url 'resume_create' %}" class="btn btn-primary mt-3">Create Resume Now</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ATS Checker{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ats.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1>ATS Compatibility Checker</h1>
+            <p class="text-muted">Check how well your resume matches a job description</p>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="ats-form" id="ats-form">
+        {% csrf_token %}
+
+        <!-- Source selection -->
+        <div class="ats-source-tabs" id="ats-source-tabs">
+            <button type="button" class="source-tab active" data-source="paste" id="source-paste">Paste Text</button>
+            <button type="button" class="source-tab" data-source="upload" id="source-upload">Upload File</button>
+            {% if resumes %}
+            <button type="button" class="source-tab" data-source="existing" id="source-existing">Use Existing Resume</button>
+            {% endif %}
+        </div>
+        <input type="hidden" name="source" id="source-value" value="paste">
+
+        <!-- Paste section -->
+        <div class="ats-source-content active" data-source-content="paste" id="source-content-paste">
+            <div class="form-group">
+                <label for="resume_text">Resume Text</label>
+                <textarea name="resume_text" id="resume_text" class="form-input" rows="8"
+                          placeholder="Paste your resume text here…"></textarea>
+            </div>
+        </div>
+
+        <!-- Upload section -->
+        <div class="ats-source-content" data-source-content="upload" id="source-content-upload">
+            <div class="form-group">
+                <label for="resume_file">Upload Resume (PDF or DOCX)</label>
+                <div class="file-upload-area" id="file-upload-area">
+                    <input type="file" name="resume_file" id="resume_file" accept=".pdf,.docx,.doc,.txt"
+                           class="file-input">
+                    <div class="file-upload-label">
+                        <span class="file-icon">📎</span>
+                        <span>Drop file here or <strong>browse</strong></span>
+                        <span class="file-hint">PDF, DOCX, or TXT (max 10 MB)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Existing resume section -->
+        {% if resumes %}
+        <div class="ats-source-content" data-source-content="existing" id="source-content-existing">
+            <div class="form-group">
+                <label for="resume_id">Select a Resume</label>
+                <select name="resume_id" id="resume_id" class="form-input">
+                    <option value="">-- Choose a resume --</option>
+                    {% for r in resumes %}
+                    <option value="{{ r.pk }}">{{ r.title }} ({{ r.full_name|default:"No name" }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Job description -->
+        <div class="form-group">
+            <label for="job_title">Job Title (optional)</label>
+            <input type="text" name="job_title" id="job_title" class="form-input"
+                   placeholder="e.g. Software Engineer">
+        </div>
+
+        <div class="form-group">
+            <label for="job_description">Job Description <span class="required">*</span></label>
+            <textarea name="job_description" id="job_description" class="form-input" rows="8"
+                      placeholder="Paste the full job description here…" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full" id="run-ats-check">
+            🎯 Check ATS Compatibility
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/ats.js' %}"></script>
+{% endblock %}

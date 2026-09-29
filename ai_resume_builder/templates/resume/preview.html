@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Preview – {{ resume.title }}{% endblock %}
+
+{% block content %}
+<div class="preview-page">
+    <div class="preview-toolbar">
+        <a href="{% url 'resume_builder' pk=resume.pk %}" class="btn btn-ghost btn-sm">← Back to Builder</a>
+        <h1 class="preview-title">{{ resume.title }} (Preview)</h1>
+        <div>
+            <a href="{% url 'resume_download_pdf' pk=resume.pk %}" class="btn btn-primary btn-sm">📥 Download PDF</a>
+        </div>
+    </div>
+
+    <div class="resume-paper-container">
+        <div class="resume-paper template-{{ resume.template }}">
+            <!-- Header -->
+            <div class="rp-header">
+                <h1 class="rp-name">{{ resume.full_name|default:"Your Name" }}</h1>
+                <div class="rp-contact">
+                    {% if resume.email %}<span>📧 {{ resume.email }}</span>{% endif %}
+                    {% if resume.phone %}<span>📱 {{ resume.phone }}</span>{% endif %}
+                    {% if resume.location %}<span>📍 {{ resume.location }}</span>{% endif %}
+                    {% if resume.linkedin %}<span>🔗 {{ resume.linkedin }}</span>{% endif %}
+                    {% if resume.website %}<span>🌐 {{ resume.website }}</span>{% endif %}
+                </div>
+            </div>
+
+            <!-- Summary -->
+            {% if resume.summary %}
+                <div class="rp-section">
+                    <h2 class="rp-section-title">Professional Summary</h2>
+                    <p class="rp-summary">{{ resume.summary }}</p>
+                </div>
+            {% endif %}
+
+            <!-- Experience -->
+            {% if experience %}
+                <div class="rp-section">
+                    <h2 class="rp-section-title">Work Experience</h2>
+                    {% for exp in experience %}
+                        <div class="rp-item">
+                            <div class="rp-item-header">
+                                <span class="rp-item-title"><strong>{{ exp.title }}</strong> {% if exp.company %}— {{ exp.company }}{% endif %}</span>
+                                <span class="rp-item-date">{{ exp.startDate }} {% if exp.endDate %}– {{ exp.endDate }}{% elif exp.current %}– Present{% endif %}</span>
+                            </div>
+                            {% if exp.location %}<div class="rp-item-sub">{{ exp.location }}</div>{% endif %}
+                            {% if exp.description %}
+                                <div class="rp-item-desc">{{ exp.description|linebreaks }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Education -->
+            {% if education %}
+                <div class="rp-section">
+                    <h2 class="rp-section-title">Education</h2>
+                    {% for edu in education %}
+                        <div class="rp-item">
+                            <div class="rp-item-header">
+                                <span class="rp-item-title"><strong>{{ edu.degree }}</strong> {% if edu.school %}— {{ edu.school }}{% endif %}</span>
+                                <span class="rp-item-date">{{ edu.startDate }} {% if edu.endDate %}– {{ edu.endDate }}{% endif %}</span>
+                            </div>
+                            {% if edu.description %}<div class="rp-item-desc">{{ edu.description }}</div>{% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Skills -->
+            {% if skills %}
+                <div class="rp-section">
+                    <h2 class="rp-section-title">Skills</h2>
+                    <div class="rp-skills-list">
+                        {% for skill in skills %}
+                            <span class="rp-skill-tag">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Projects -->
+            {% if projects %}
+                <div class="rp-section">
+                    <h2 class="rp-section-title">Projects</h2>
+                    {% for proj in projects %}
+                        <div class="rp-item">
+                            <div class="rp-item-header">
+                                <span class="rp-item-title"><strong>{{ proj.name }}</strong></span>
+                                {% if proj.link %}<a href="{{ proj.link }}" target="_blank" class="rp-item-link">{{ proj.link }}</a>{% endif %}
+                            </div>
+                            {% if proj.description %}<div class="rp-item-desc">{{ proj.description }}</div>{% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

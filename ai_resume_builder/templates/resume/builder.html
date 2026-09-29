@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Build Resume – {{ resume.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/builder.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="builder-page" id="builder-page">
+    <!-- Builder header -->
+    <div class="builder-header" id="builder-header">
+        <div class="builder-header-left">
+            <a href="{% url 'resume_list' %}" class="btn btn-ghost btn-sm">← Back</a>
+            <h1 class="builder-title">{{ resume.title }}</h1>
+        </div>
+        <div class="builder-header-right">
+            <a href="{% url 'resume_preview' pk=resume.pk %}" class="btn btn-outline btn-sm" id="btn-preview">Preview</a>
+            <a href="{% url 'resume_download_pdf' pk=resume.pk %}" class="btn btn-primary btn-sm" id="btn-download">Download PDF</a>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="builder-tabs" id="builder-tabs">
+        <button class="tab-btn active" data-tab="personal" id="tab-personal">Personal Info</button>
+        <button class="tab-btn" data-tab="experience" id="tab-experience">Experience</button>
+        <button class="tab-btn" data-tab="education" id="tab-education">Education</button>
+        <button class="tab-btn" data-tab="skills" id="tab-skills">Skills</button>
+        <button class="tab-btn" data-tab="projects" id="tab-projects">Projects</button>
+    </div>
+
+    <!-- ═══════════════════ Personal Info Tab ═══════════════════ -->
+    <div class="tab-content active" data-tab-content="personal" id="tab-content-personal">
+        <form method="post" class="builder-form" id="personal-form">
+            {% csrf_token %}
+            <div class="form-section">
+                <h2 class="form-section-title">Personal Information</h2>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.title.id_for_label }}">Resume Title</label>
+                        {{ form.title }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.template.id_for_label }}">Template</label>
+                        {{ form.template }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.full_name.id_for_label }}">Full Name</label>
+                        {{ form.full_name }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.email.id_for_label }}">Email</label>
+                        {{ form.email }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.phone.id_for_label }}">Phone</label>
+                        {{ form.phone }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.location.id_for_label }}">Location</label>
+                        {{ form.location }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.linkedin.id_for_label }}">LinkedIn</label>
+                        {{ form.linkedin }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.website.id_for_label }}">Website</label>
+                        {{ form.website }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.summary.id_for_label }}">Professional Summary</label>
+                    {{ form.summary }}
+                    <button type="button" class="btn btn-sm btn-ai" id="ai-improve-summary"
+                            onclick="aiImprove('summary')">
+                        ✨ Improve with AI
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="save-personal">Save Personal Info</button>
+        </form>
+    </div>
+
+    <!-- ═══════════════════ Experience Tab ═══════════════════ -->
+    <div class="tab-content" data-tab-content="experience" id="tab-content-experience">
+        <div class="form-section">
+            <div class="section-header-row">
+                <h2 class="form-section-title">Work Experience</h2>
+                <button class="btn btn-sm btn-outline" id="add-experience" onclick="addExperience()">+ Add</button>
+            </div>
+            <div id="experience-list">
+                <!-- Populated by JS -->
+            </div>
+            <button class="btn btn-primary" id="save-experience" onclick="saveSection('experience')">Save Experience</button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ Education Tab ═══════════════════ -->
+    <div class="tab-content" data-tab-content="education" id="tab-content-education">
+        <div class="form-section">
+            <div class="section-header-row">
+                <h2 class="form-section-title">Education</h2>
+                <button class="btn btn-sm btn-outline" id="add-education" onclick="addEducation()">+ Add</button>
+            </div>
+            <div id="education-list">
+                <!-- Populated by JS -->
+            </div>
+            <button class="btn btn-primary" id="save-education" onclick="saveSection('education')">Save Education</button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ Skills Tab ═══════════════════ -->
+    <div class="tab-content" data-tab-content="skills" id="tab-content-skills">
+        <div class="form-section">
+            <h2 class="form-section-title">Skills</h2>
+
+            <div class="skills-input-row" id="skills-input-row">
+                <input type="text" class="form-input" id="skill-input" placeholder="Type a skill and press Enter">
+                <button class="btn btn-sm btn-outline" id="add-skill-btn" onclick="addSkillFromInput()">Add</button>
+            </div>
+
+            <div class="skills-tags" id="skills-tags">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="ai-suggest-row">
+                <input type="text" class="form-input" id="suggest-job-title" placeholder="Job title for suggestions">
+                <button class="btn btn-sm btn-ai" id="suggest-skills-btn" onclick="suggestSkills()">✨ Suggest Skills</button>
+            </div>
+
+            <div id="suggested-skills" class="suggested-skills" style="display:none;">
+                <!-- Populated by JS -->
+            </div>
+
+            <button class="btn btn-primary" id="save-skills" onclick="saveSection('skills')">Save Skills</button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ Projects Tab ═══════════════════ -->
+    <div class="tab-content" data-tab-content="projects" id="tab-content-projects">
+        <div class="form-section">
+            <div class="section-header-row">
+                <h2 class="form-section-title">Projects</h2>
+                <button class="btn btn-sm btn-outline" id="add-project" onclick="addProject()">+ Add</button>
+            </div>
+            <div id="projects-list">
+                <!-- Populated by JS -->
+            </div>
+            <button class="btn btn-primary" id="save-projects" onclick="saveSection('projects')">Save Projects</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Pass current data from Django to JS
+    const RESUME_PK = {{ resume.pk }};
+    const CSRF_TOKEN = '{{ csrf_token }}';
+    const INITIAL_DATA = {
+        experience: {{ experience|safe }},
+        education: {{ education|safe }},
+        skills: {{ skills|safe }},
+        projects: {{ projects|safe }},
+        certifications: {{ certifications|safe }}
+    };
+</script>
+<script src="{% static 'js/builder.js' %}"></script>
+{% endblock %}

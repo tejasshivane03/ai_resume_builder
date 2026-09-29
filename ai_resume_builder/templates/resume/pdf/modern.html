@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ resume.title }}</title>
+    <style>
+        @page { size: letter portrait; margin: 12mm 15mm; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10pt; line-height: 1.4; color: #1e293b; margin: 0; padding: 0; }
+        .header { border-bottom: 2px solid #2563eb; padding-bottom: 10px; margin-bottom: 12px; }
+        .name { font-size: 20pt; font-weight: bold; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px 0; }
+        .contact { font-size: 9pt; color: #475569; }
+        .section-title { font-size: 11pt; font-weight: bold; color: #2563eb; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; padding-bottom: 2px; margin-top: 12px; margin-bottom: 6px; }
+        .summary { font-size: 9.5pt; color: #334155; margin-bottom: 10px; }
+        .item { margin-bottom: 8px; }
+        .item-header { display: flex; justify-content: space-between; font-weight: bold; }
+        .company { color: #475569; font-weight: normal; }
+        .date { float: right; font-weight: normal; color: #64748b; font-size: 8.5pt; }
+        .desc { font-size: 9pt; color: #334155; margin-top: 2px; }
+        .skills-container { font-size: 9pt; }
+        .skill-item { display: inline-block; background: #f1f5f9; padding: 2px 6px; margin: 2px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="name">{{ resume.full_name|default:"Resume" }}</h1>
+        <div class="contact">
+            {% if resume.email %}{{ resume.email }}{% endif %}
+            {% if resume.phone %} | {{ resume.phone }}{% endif %}
+            {% if resume.location %} | {{ resume.location }}{% endif %}
+            {% if resume.linkedin %} | {{ resume.linkedin }}{% endif %}
+            {% if resume.website %} | {{ resume.website }}{% endif %}
+        </div>
+    </div>
+
+    {% if resume.summary %}
+    <div class="section">
+        <div class="section-title">Professional Summary</div>
+        <div class="summary">{{ resume.summary }}</div>
+    </div>
+    {% endif %}
+
+    {% if experience %}
+    <div class="section">
+        <div class="section-title">Work Experience</div>
+        {% for exp in experience %}
+        <div class="item">
+            <div class="item-header">
+                <span class="date">{{ exp.startDate }} {% if exp.endDate %}– {{ exp.endDate }}{% elif exp.current %}– Present{% endif %}</span>
+                <strong>{{ exp.title }}</strong> <span class="company">{% if exp.company %}— {{ exp.company }}{% endif %}</span>
+            </div>
+            {% if exp.description %}<div class="desc">{{ exp.description|linebreaksbr }}</div>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if education %}
+    <div class="section">
+        <div class="section-title">Education</div>
+        {% for edu in education %}
+        <div class="item">
+            <div class="item-header">
+                <span class="date">{{ edu.startDate }} {% if edu.endDate %}– {{ edu.endDate }}{% endif %}</span>
+                <strong>{{ edu.degree }}</strong> <span class="company">{% if edu.school %}— {{ edu.school }}{% endif %}</span>
+            </div>
+            {% if edu.description %}<div class="desc">{{ edu.description }}</div>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if skills %}
+    <div class="section">
+        <div class="section-title">Skills</div>
+        <div class="skills-container">
+            {% for skill in skills %}
+                <span class="skill-item">{{ skill }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if projects %}
+    <div class="section">
+        <div class="section-title">Projects</div>
+        {% for proj in projects %}
+        <div class="item">
+            <strong>{{ proj.name }}</strong> {% if proj.link %}({{ proj.link }}){% endif %}
+            {% if proj.description %}<div class="desc">{{ proj.description }}</div>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</body>
+</html>
